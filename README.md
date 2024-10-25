@@ -2,8 +2,9 @@
 
 npm管轄のパッケージに限定して、CPE文字列を生成します
 
-- パッケージのURLは `https://www.npmjs.com/*` である必要があります
-- CPE Dictionary に登録されていないパッケージは生成できません。過去に登録されていたパッケージのバージョン違いを生成します
+- CPE 2.3 の Target Software が 'node.js' のものに限定して検索します
+- パッケージのURLが `reference#href` で見つからない場合は `https://www.npmjs.com/package/NAME` で再検索します
+- 過去に登録されていたパッケージのバージョン違いとして生成します。過去に登録されていないパッケージは生成できません
 
 
 ## 使い方
@@ -25,18 +26,28 @@ npm管轄のパッケージに限定して、CPE文字列を生成します
 1. 以下のコマンドでCPE文字列を生成します
 
     ```bash
-    yarn start https://www.npmjs.com/package/express 9.9.9
+    yarn start https://github.com/expressjs/express 9.9.9
     #=>
     {
-        target: 'https://www.npmjs.com/package/express',
+        target: 'https://github.com/package/express',
         cpe: 'cpe:2.3:a:openjsf:express:9.9.9:*:*:*:*:node.js:*:*'
     }
 
+    # https://www.npmjs.com/package/* として見つかる場合
+    #   official-cpe-dictionary_v2.3.xml では https://github.com/visionmedia/debug は
+    #   <reference href="https://www.npmjs.com/package/debug"> となっています
+    yarn start https://github.com/visionmedia/debug 9.9.9
+    =>
+    {
+        target: 'https://github.com/visionmedia/debug',
+        cpe: 'cpe:2.3:a:debug_project:debug:9.9.9:*:*:*:*:node.js:*:*'
+    }
+
     # パッケージが見つからない場合
-    yarn start https://www.npmjs.com/package/cookie 9.9.9
+    yarn start https://github.com/package/cookie 9.9.9
     #=>
     {
-        target: 'https://www.npmjs.com/package/cookie', cpe: undefined
+        target: 'https://github.com/package/cookie', cpe: undefined
     }
     ```
 
